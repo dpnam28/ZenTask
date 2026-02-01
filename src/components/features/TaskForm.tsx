@@ -24,7 +24,7 @@ export const TaskForm = () => {
                 <textarea
                     name="description"
                     rows={3}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-200"
+                    className={`${state?.error?.description ? 'border-red-500 focus:ring-red-200' : ""} w-full mt-1 p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-200`}
                 />
             </div>
             <div>

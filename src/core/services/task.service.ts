@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { ITask, TaskStatus } from "../entities/task.entity";
 import { CreateTaskSchema } from "../validations/task.schema";
-
+import { ZodValidationError } from "../errors/task.error";
 export class TaskService {
   async getAllTasks(): Promise<ITask[]> {
     const tasks = await db.task.findMany({
@@ -12,13 +12,13 @@ export class TaskService {
     return tasks as ITask[];
   }
   async createTask(data: {
-    title: string;
-    description?: string;
-    deadline?: Date;
+    title: FormDataEntryValue;
+    description: FormDataEntryValue | null;
+    deadline?: FormDataEntryValue | undefined;
   }): Promise<ITask> {
     const validatedData = CreateTaskSchema.safeParse(data);
     if (!validatedData.success) {
-      throw new Error(validatedData.error.flatten().fieldErrors.title?.[0] || validatedData.error.flatten().fieldErrors.description?.[0] || validatedData.error.flatten().fieldErrors.deadline?.[0] || "Something went wrong");
+      throw new ZodValidationError(validatedData.error.flatten().fieldErrors)
     }
     return await db.task.create({
       data: {

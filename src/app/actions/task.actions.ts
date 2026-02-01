@@ -4,6 +4,7 @@ import { TaskService } from "@/core/services/task.service"
 import { CreateTaskSchema, UpdateTaskSchema } from "@/core/validations/task.schema"
 import { TaskStatus } from "@/core/entities/task.entity"
 import { revalidatePath } from "next/cache"
+import { ZodValidationError } from "@/core/errors/task.error"
 
 const taskService = new TaskService()
 
@@ -19,27 +20,21 @@ export type ActionState = {
 
 export async function createTaskAction(_: ActionState | null, formData: FormData): Promise<ActionState> {
     const rawData = {
-        title: formData.get("title"),
-        description: formData.get("description"),
+        title: formData.get("title")!,
+        description: formData.get("description") || null,
         deadline: formData.get("deadline") || undefined,
     }
 
-    const validatedData = CreateTaskSchema.safeParse(rawData)
-    if (!validatedData.success) {
-        console.log(validatedData.error.flatten().fieldErrors)
-        return {
-            error: validatedData.error.flatten().fieldErrors
-        }
-    }
-
     try {
-        await taskService.createTask(validatedData.data)
+        await taskService.createTask(rawData)
         revalidatePath("/")
         return {
             success: true
         }
-    } catch (error) {
-        console.error("CREATE TASK ERROR:", error);
+    } catch (e: any) {
+        if (e?.name == "ZodValidationError") {
+            return { error: e.error };
+        }
         return {
             error: {
                 server: ["Something went wrong"]
