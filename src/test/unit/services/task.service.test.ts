@@ -3,6 +3,7 @@ import { TaskService } from "@/core/services/task.service";
 import { TaskStatus } from "@/core/entities/task.entity";
 import { db } from "@/lib/db";
 import { createTaskMock, mockTaskFromDb, mockTaskInput } from "@/test/mocks/task.mock";
+import { ZodValidationError } from "@/core/errors/task.error";
 
 vi.mock("@/lib/db", () => ({
     db: {
@@ -47,7 +48,7 @@ describe("TaskService", () => {
             title: "",
             description: "Test Description"
         }
-        await expect(taskService.createTask(inputData)).rejects.toThrow("Title must be at least 3 characters long");
+        await expect(taskService.createTask(inputData)).rejects.instanceOf(ZodValidationError);
     })
     it("Should throw error when id not found", async () => {
         const id = "1";

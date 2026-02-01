@@ -20,9 +20,11 @@ export type ActionState = {
 
 export async function createTaskAction(_: ActionState | null, formData: FormData): Promise<ActionState> {
     const rawData = {
-        title: formData.get("title")!,
-        description: formData.get("description") || null,
-        deadline: formData.get("deadline") || undefined,
+        title: formData.get("title")!.toString() as string,
+        description: formData.get("description")!.toString(),
+        deadline: formData.get("deadline")
+            ? new Date(formData.get("deadline") as string)
+            : undefined
     }
 
     try {

@@ -12,9 +12,9 @@ export class TaskService {
     return tasks as ITask[];
   }
   async createTask(data: {
-    title: FormDataEntryValue;
-    description: FormDataEntryValue | null;
-    deadline?: FormDataEntryValue | undefined;
+    title: string;
+    description: string;
+    deadline?: Date;
   }): Promise<ITask> {
     const validatedData = CreateTaskSchema.safeParse(data);
     if (!validatedData.success) {
